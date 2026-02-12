@@ -2,52 +2,78 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Quiz</title>
   <style>
     body{
       background:#0b0f19;
       color:white;
-      font-family:Arial;
+      font-family:Arial, sans-serif;
       display:flex;
       justify-content:center;
       align-items:center;
-      height:100vh;
+      min-height:100vh;
       margin:0;
       text-align:center;
+      padding:20px;
+      box-sizing:border-box;
     }
-
     .card{
-      background:rgba(255,255,255,0.05);
-      padding:25px;
-      border-radius:15px;
-      width:420px;
+      background:rgba(255,255,255,0.06);
+      padding:24px;
+      border-radius:16px;
+      width:min(520px, 92vw);
+      box-shadow:0 12px 30px rgba(0,0,0,0.35);
+      border:1px solid rgba(255,255,255,0.10);
     }
-
+    .top{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+      opacity:0.9;
+      font-size:13px;
+    }
+    .pill{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.12);
+      background:rgba(255,255,255,0.06);
+    }
+    h2{ margin:10px 0 12px; font-size:18px; }
     button{
-      padding:10px 15px;
+      padding:10px 14px;
       margin:6px;
       border:none;
-      border-radius:8px;
-      font-weight:bold;
+      border-radius:10px;
+      font-weight:800;
       cursor:pointer;
-      transition:transform .2s;
+      transition:transform .2s, background .2s;
+      color:white;
     }
+    .choice{ background:rgba(255,255,255,0.10); }
+    .choice:hover{ background:rgba(255,255,255,0.16); transform: translateY(-1px); }
 
-    #yesBtn{ background:#2ecc71; color:white; }
-    #noBtn{ background:#e74c3c; color:white; }
+    #yesBtn{ background:#2ecc71; }
+    #noBtn{ background:#e74c3c; }
 
     img{
-      width:260px;
+      width:min(320px, 86vw);
       border-radius:12px;
       margin:12px 0;
+      box-shadow:0 10px 22px rgba(0,0,0,0.35);
+      border:1px solid rgba(255,255,255,0.10);
     }
-
     .bigLove{
-      font-size:48px;
+      font-size:52px;
       font-weight:900;
+      letter-spacing:1px;
+      margin-top:10px;
       color:#ff4d6d;
-      margin-top:20px;
+      text-shadow:0 10px 30px rgba(255,77,109,0.25);
     }
+    .muted{ opacity:0.8; font-size:13px; margin-top:6px; }
   </style>
 </head>
 <body>
@@ -55,62 +81,90 @@
 <div class="card" id="app"></div>
 
 <script>
-const quiz = [
-  { q:"Quelle est la capitale de l’Italie ?", choices:["Milan","Rome","Venise"], answer:1 },
-  { q:"Combien font 9 × 7 ?", choices:["63","72","56"], answer:0 }
-];
+  // 5 questions avant la question finale
+  const quiz = [
+    { q:"Quelle est la capitale de l’Italie ?", choices:["Milan","Rome","Venise","Naples"], answer:1 },
+    { q:"Combien de continents existe-t-il ?", choices:["5","6","7","8"], answer:2 },
+    { q:"Quel est le plus grand océan du monde ?", choices:["Atlantique","Indien","Pacifique","Arctique"], answer:2 },
+    { q:"Combien font 9 × 7 ?", choices:["56","63","72","49"], answer:1 },
+    { q:"Quelle planète est surnommée la planète rouge ?", choices:["Vénus","Mars","Jupiter","Mercure"], answer:1 }
+  ];
 
-let index=0;
-const app=document.getElementById("app");
+  let index = 0;
+  let score = 0;
+  const app = document.getElementById("app");
 
-function renderQuestion(){
-  const item=quiz[index];
-  app.innerHTML=`
-    <h2>${item.q}</h2>
-    ${item.choices.map((c,i)=>`<button onclick="answer(${i})">${c}</button>`).join("")}
-  `;
-}
-
-function answer(i){
-  index++;
-  if(index<quiz.length) renderQuestion();
-  else renderValentine();
-}
-
-const questionGif="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcXdjc2EwOHl6bWNlc3hka2UzNjFoOHUyajhiMTlrMXZrN3A2OGV4dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/16OzPTMlBMiH6Yze1n/giphy.gif";
-const yesGif="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExdnN2cXNpNGR0Ymg1ZW1rc3ppcHp0ZnI4YXYzdzBjdGVwZnBlZmFkbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/T70hpBP1L0N7U0jtkq/giphy.gif";
-
-const noTexts=["Non","T’es sûre ?","Vraiment ?","Allez stp","Dernière chance"];
-
-function renderValentine(){
-  app.innerHTML=`
-    <h2>Saynela veux tu être ma valentine pour cette Saint-Valentin et le reste de ta vie ?</h2>
-    <img src="${questionGif}">
-    <div>
-      <button id="noBtn">${noTexts[0]}</button>
-      <button id="yesBtn">Oui</button>
-    </div>
-  `;
-
-  let noCount=0;
-  const noBtn=document.getElementById("noBtn");
-  const yesBtn=document.getElementById("yesBtn");
-
-  noBtn.onclick=()=>{
-    noCount++;
-    yesBtn.style.transform="scale("+(1+noCount*0.4)+")";
-    noBtn.innerText=noTexts[Math.min(noCount,noTexts.length-1)];
-  };
-
-  yesBtn.onclick=()=>{
-    app.innerHTML=`
-      <img src="${yesGif}">
-      <div class="bigLove">TE IUBESC !!</div>
+  function renderQuestion(){
+    const item = quiz[index];
+    app.innerHTML = `
+      <div class="top">
+        <div class="pill">Question ${index+1} / ${quiz.length}</div>
+        <div class="pill">Score: ${score}</div>
+      </div>
+      <h2>${item.q}</h2>
+      <div>
+        ${item.choices.map((c,i)=>`<button class="choice" onclick="answer(${i})">${c}</button>`).join("")}
+      </div>
+      <div class="muted">Clique une réponse pour continuer.</div>
     `;
-  };
-}
+  }
 
-renderQuestion();
+  function answer(i){
+    if(i === quiz[index].answer) score++;
+    index++;
+    if(index < quiz.length) renderQuestion();
+    else renderValentine();
+  }
+
+  const questionGif = "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcXdjc2EwOHl6bWNlc3hka2UzNjFoOHUyajhiMTlrMXZrN3A2OGV4dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/16OzPTMlBMiH6Yze1n/giphy.gif";
+  const yesGif = "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExdnN2cXNpNGR0Ymg1ZW1rc3ppcHp0ZnI4YXYzdzBjdGVwZnBlZmFkbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/T70hpBP1L0N7U0jtkq/giphy.gif";
+
+  const noTexts = ["Non","T’es sûre ?","Vraiment ?","Allez stp","Dernière chance","Ok… mais…","Dis oui 😭"];
+
+  function renderValentine(){
+    app.innerHTML = `
+      <div class="top">
+        <div class="pill">Fin du quiz</div>
+        <div class="pill">Score final: ${score} / ${quiz.length}</div>
+      </div>
+      <h2>Saynela veux tu être ma valentine pour cette Saint valentin et le reste de ta vie ?</h2>
+      <img src="${questionGif}" alt="gif question">
+      <div>
+        <button id="noBtn">${noTexts[0]}</button>
+        <button id="yesBtn">Oui</button>
+      </div>
+      <div class="muted">(Indice : le bouton Oui devient énorme si tu insistes sur Non 😅)</div>
+    `;
+
+    let noCount = 0;
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+
+    // Grossit VRAIMENT : croissance rapide + limite pour pas casser l'écran
+    function yesScale(n){
+      const s = Math.pow(1.45, n);     // 1.45^n => grossit vite
+      return Math.min(s, 7.5);         // limite
+    }
+
+    noBtn.onclick = () => {
+      noCount++;
+      yesBtn.style.transform = "scale(" + yesScale(noCount) + ")";
+      noBtn.innerText = noTexts[Math.min(noCount, noTexts.length-1)];
+
+      // Bonus: le Non rétrécit un peu
+      const ns = Math.max(1 - noCount * 0.08, 0.55);
+      noBtn.style.transform = "scale(" + ns + ")";
+    };
+
+    yesBtn.onclick = () => {
+      app.innerHTML = `
+        <img src="${yesGif}" alt="gif oui">
+        <div class="bigLove">TE IUBESC !!</div>
+      `;
+    };
+  }
+
+  renderQuestion();
 </script>
 
 </body>
